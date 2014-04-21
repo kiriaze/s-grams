@@ -1,25 +1,18 @@
 <?php
-/**
- *
- * @package   Simple_Grams
- * @author    Constantine Kiriaze <hello@kiriaze.com>
- * @license   GPL-2.0+
- * @link      http://getsimple.io
- * @copyright 2013 Simple
- *
- * @wordpress-plugin
- * Plugin Name:       Simple Grams
- * Plugin URI:        http://getsimple.io
- * Description:       Provides a shortcode and widget for displaying your most recent Instagrams. [grams account="" count="" tag="" class="" effects=""]
- * Version:           1.0.0
- * Author:            Constantine Kiriaze
- * Author URI:        kiriaze.com
- * Text Domain:       simple-grams
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Domain Path:       /languages
- * GitHub Plugin URI: https://github.com/
- */
+/*
+Plugin Name:     Simple Grams
+Plugin URI:      https://github.com/kiriaze/simple-grams
+Description:     Provides a shortcode and widget for displaying your most recent Instagrams. [grams account="" count="" tag="" class="" effects=""]
+Version:         1.0.0
+Author:          Constantine Kiriaze (@kiriaze)
+Author URI:      http://getsimple.io/about
+License:         GNU General Public License v2 or later
+License URI:     http://www.gnu.org/licenses/gpl-2.0.html
+Copyright:       (c) 2013, Constantine Kiriaze
+Text Domain:     simple
+GitHub Plugin URI: https://github.com/kiriaze/simple-grams
+GitHub Branch:     master
+*/
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
