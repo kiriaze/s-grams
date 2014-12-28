@@ -270,7 +270,7 @@ class Simple_Grams {
 	        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	        curl_setopt($ch, CURLOPT_HEADER, 0);
 	        curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
-	        curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0); 
+	        curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
 	        $output = curl_exec($ch);
 	        echo curl_error($ch);
 	        curl_close($ch);
@@ -294,19 +294,24 @@ class Simple_Grams {
 	}
 
 	public function do_simple_grams( $account, $count = 4, $tag = '', $class = 'simple_grams', $effects = '' ) {
-		
+
 		$accessToken = '24765686.f4c7bbf.e2dd3e076b0e4fff992ec9de1898acb2'; // wordpress.dev
 		// ask for CLIENT-ID & REDIRECT-URI
 		// https://instagram.com/oauth/authorize/?client_id=CLIENT-ID&redirect_uri=REDIRECT-URI&response_type=token
 
 		$userData = 'https://api.instagram.com/v1/users/search?q='.$account.'&access_token='.$accessToken;
 
-		$jsonUserData = json_decode( ( file_get_contents($userData) ) );
+		if ( $userData !== false )
+		$jsonUserData = json_decode( ( @file_get_contents($userData) ) );
 		// sp($jsonUserData);
-		foreach( $jsonUserData->data as $userKey=>$userValue ){
-			// sp($userValue->id);
-			$userID = $userValue->id;
-		}
+		if ( $jsonUserData ) :
+			foreach ( $jsonUserData->data as $userKey=>$userValue ) :
+				// sp($userValue->id);
+				$userID = $userValue->id;
+			endforeach;
+		else :
+			$userID = '';
+		endif;
 
 		if ( $tag ) {
 			$url = 'https://api.instagram.com/v1/tags/'.$tag.'/media/recent?access_token=' . $accessToken . '&count=' . $count;
@@ -327,7 +332,7 @@ class Simple_Grams {
 		    $images = array();
 
 		    if( $response ) {
-		    	
+
 		    	$data = json_decode($response)->data;
 
 		        // Decode the response and build an array
@@ -358,9 +363,9 @@ class Simple_Grams {
 		$class = isset($class) ? ' class="'.$class.'"' : null;
 		$effects = isset($effects) ? ' class="'.$effects.'"' : null;
 		$output = '<ul'.$class.'>';
-		
+
 		foreach( $images as $image ) {
-			
+
 			$output .= '<li class="simple-gram">';
 			$output .= '<a title="" href="' . $image['src'] . '"'. $effects .'>'; // link to large photo
 			$output .= '<img src=" ' . $image['src'] . ' " alt="" />';
@@ -396,11 +401,11 @@ class Simple_Grams_Widget extends WP_Widget {
 	public function __construct() {
 		parent::__construct(
 	 		'simple_grams', // BASE ID
-			'Instagrams (Simple)', // NAME
+			'SimpleGrams', // NAME
 			array( 'description' => __( 'A widget that displays your Instagrams', 'simple' ), )
 		);
 	}
-	
+
 
 	/*--------------------------------------------------*/
 	/* Widget API Functions
@@ -412,7 +417,7 @@ class Simple_Grams_Widget extends WP_Widget {
 	 * @args			The array of form elements
 	 * @instance		The current instance of the widget
 	 */
-	 
+
 	function widget( $args, $instance ) {
 
 		extract( $args, EXTR_SKIP );
@@ -424,14 +429,14 @@ class Simple_Grams_Widget extends WP_Widget {
 		$count 		= $instance['count'];
 
 		echo $before_widget;
-			
+
 		if ( !empty( $title ) ) echo $before_title . $title . $after_title;
-		
+
 		$plugin = Simple_Grams::get_instance();
 		echo $plugin->do_simple_grams( esc_attr($account), esc_attr($count) );
-		
+
 		echo $after_widget;
-		
+
 	} // END WIDGET
 
 	/**
@@ -440,25 +445,25 @@ class Simple_Grams_Widget extends WP_Widget {
 	 * @new_instance	The previous instance of values before the update.
 	 * @old_instance	The new instance of values to be generated via the update.
 	 */
-	 
+
 	function update( $new_instance, $old_instance ) {
-		
+
 		// STRIP TAGS TO REMOVE HTML - IMPORTANT FOR TEXT IMPUTS
 		$instance 				= $old_instance;
 		$instance['title'] 		= strip_tags($new_instance['title']);
 		$instance['account'] 	= trim($new_instance['account']);
 		$instance['count'] 		= trim($new_instance['count']);
 		$instance['cache'] 		= trim($new_instance['cache']);
-		
+
 		return $instance;
-		
+
 	}
 
 	/**
 	 * GENERATES THE ADMIN FORM FOR THE WIDGET
 	 * @instance
 	 */
-	 
+
 	function form( $instance ) {
 
 		// WIDGET DEFAULTS
@@ -476,17 +481,17 @@ class Simple_Grams_Widget extends WP_Widget {
 		$cache 		= $instance['cache'];
 
 		?>
-		
+
 		<p>
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'simple'); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
-		
+
 		<p>
 			<label for="<?php echo $this->get_field_id('account'); ?>"><?php _e('<a href="http://www.dribbble.com/constantine">Instagram</a> account:', 'simple'); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id('account'); ?>" name="<?php echo $this->get_field_name('account'); ?>" type="text" value="<?php echo $account; ?>" />
 		</p>
-		
+
 		<p>
 			<label for="<?php echo $this->get_field_id('count'); ?>"><?php _e('Number of Grams:', 'simple'); ?></label>
 			<select name="<?php echo $this->get_field_name('count'); ?>">
@@ -500,9 +505,9 @@ class Simple_Grams_Widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('cache'); ?>"><?php _e('Cache:', 'simple'); ?> (Coming Soon!)</label>
 			<input class="widefat" id="<?php echo $this->get_field_id('cache'); ?>" name="<?php echo $this->get_field_name('cache'); ?>" type="text" value="<?php echo $cache; ?>" />
 		</p>
-		
+
 	<?php
-		
+
 	} // END FORM
 
 } // END CLASS
